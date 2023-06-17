@@ -107,6 +107,7 @@ async function main() {
     symmetricKey,
     authSig,
     chain: CHAIN,
+    permanent: 0,
   });
 
   const toDecrypt = LitJsSdk.uint8arrayToString(
