@@ -11,6 +11,10 @@ import {
 const CHAIN_ID = 80001;
 const CHAIN = "mumbai";
 
+function rmOx(str) {
+  return str.replace(/^0x/, "");
+}
+
 const signAuthMessage = async (resources) => {
   // Replace this with you private key
   const privKey =
@@ -70,18 +74,44 @@ async function main() {
 
   const evmContractConditions = [
     {
-      contractAddress: "0x42e3dD0Cc7957dDc04aF14A44aD29d30a25F7d64",
-      functionName: "authorizedIssuers",
-      functionParams: [":litParam:addr"],
+      contractAddress: "0xC10Ae43129192D15A0a30Dcab487Ed0428AAc5FE",
+      functionName: "canDecrypt",
+      functionParams: [
+        ":litParam:scene",
+        ":litParam:user",
+        ":litParam:requestor",
+        ":litParam:uuids",
+        ":litParam:signature",
+      ],
       functionAbi: {
         inputs: [
           {
+            internalType: "string",
+            name: "scene",
+            type: "string",
+          },
+          {
             internalType: "address",
-            name: "addr",
+            name: "user",
             type: "address",
           },
+          {
+            internalType: "address",
+            name: "requestor",
+            type: "address",
+          },
+          {
+            internalType: "uint256[]",
+            name: "uuids",
+            type: "uint256[]",
+          },
+          {
+            internalType: "bytes",
+            name: "signature",
+            type: "bytes",
+          },
         ],
-        name: "authorizedIssuers",
+        name: "canDecrypt",
         outputs: [
           {
             internalType: "bool",
@@ -92,7 +122,7 @@ async function main() {
         stateMutability: "view",
         type: "function",
       },
-      chain: CHAIN,
+      chain: "mumbai",
       returnValueTest: {
         key: "",
         comparator: "=",
@@ -120,22 +150,42 @@ async function main() {
     "base16"
   );
 
-  const contractParamData = "0x0f97C506B7c3E38e487BDd5C9F381514E1f21eb9";
-  const sessionCapabilityObject = newSessionCapabilityObject();
-  const resource = `litParam:addr:${LitJsSdk.uint8arrayToString(
-    LitJsSdk.uint8arrayFromString(contractParamData, "utf8"),
-    "base64urlpad"
-  )}`;
-  const litResource = new LitAccessControlConditionResource(
-    `litParam:addr:${resource}`
-  );
-  sessionCapabilityObject.addCapabilityForResource(
-    litResource,
-    LitAbility.AccessControlConditionDecryption
-  );
+  const user = "0x31C5bd64D62cca56aA3A5e8486c7d9103EfFb5Fc";
+  const uuids = [
+    "9902652726180147746430150263113238388949401383732865956487362701780228133241",
+    "102286496491116273792549272839046822105423891360175458581979267554964815629946",
+  ];
+  const requestor = "0x4c79B28335723E158b8F02b7E3191Aa570B2ED91";
+  const signature =
+    "0xa8c09432d1d31c77177675c4c781805ca2a1b818ffc0356fa789028190fab73700d676ce77fcebeb70a5268bdb6d04808a69c1dcbeedd9f97e3d925bd2c8e88d1b";
+
+  const uuidStr = uuids
+    .map((str) => {
+      return rmOx(str);
+    })
+    .join(",");
 
   authSig = await signAuthMessage([
-    sessionCapabilityObject.encodeAsSiweResource(),
+    `litParam:scene:${LitJsSdk.uint8arrayToString(
+      LitJsSdk.uint8arrayFromString(rmOx("project"), "utf8"),
+      "base64urlpad"
+    )}`,
+    `litParam:user:${LitJsSdk.uint8arrayToString(
+      LitJsSdk.uint8arrayFromString(rmOx(user), "utf8"),
+      "base64urlpad"
+    )}`,
+    `litParam:requestor:${LitJsSdk.uint8arrayToString(
+      LitJsSdk.uint8arrayFromString(rmOx(requestor), "utf8"),
+      "base64urlpad"
+    )}`,
+    `litParam:uuids:${LitJsSdk.uint8arrayToString(
+      LitJsSdk.uint8arrayFromString(`[${uuidStr}]`, "utf8"),
+      "base64urlpad"
+    )}`,
+    `litParam:signature:${LitJsSdk.uint8arrayToString(
+      LitJsSdk.uint8arrayFromString(rmOx(signature), "utf8"),
+      "base64urlpad"
+    )}`,
   ]);
 
   const _symmetricKey = await litNodeClient.getEncryptionKey({
