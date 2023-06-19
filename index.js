@@ -1,7 +1,7 @@
 import * as LitJsSdk from "@lit-protocol/lit-node-client-nodejs";
 import * as u8a from "uint8arrays";
 import ethers from "ethers";
-import siwe from "siwe";
+import { SiweMessage } from "lit-siwe";
 import {
   newSessionCapabilityObject,
   LitAccessControlConditionResource,
@@ -23,20 +23,24 @@ const signAuthMessage = async (resources) => {
   const statement =
     "This is a test statement.  You can put anything you want here.";
 
+  const expiration = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString();
+
+  console.log("walet address", wallet.address);
+
   const message = {
     domain,
     address: wallet.address,
-    statement,
     uri: origin,
     version: "1",
     chainId: CHAIN_ID,
+    expirationTime: expiration,
   };
 
   if (resources) {
     message.resources = resources;
   }
 
-  const siweMessage = new siwe.SiweMessage(message);
+  const siweMessage = new SiweMessage(message);
 
   const messageToSign = siweMessage.prepareMessage();
 
@@ -45,6 +49,7 @@ const signAuthMessage = async (resources) => {
   console.log("signature", signature);
 
   const recoveredAddress = ethers.utils.verifyMessage(messageToSign, signature);
+  console.log("recoveredAddress", recoveredAddress);
 
   const authSig = {
     sig: signature,
