@@ -19,7 +19,7 @@ function rmOx(str) {
 const signAuthMessage = async (resources) => {
   // Replace this with you private key
   const privKey =
-    "ae53275d9b77fe2615f7cb49779d80748f065a62eaa0a3376d462f1650077829";
+    "03fc1e1d4a0db3ee7254ca41e6f1a4305d878f34c986b8ca8eab089653d68bf8";
   const privKeyBuffer = u8a.fromString(privKey, "base16");
   const wallet = new ethers.Wallet(privKeyBuffer);
 
