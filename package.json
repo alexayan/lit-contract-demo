@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@lit-protocol/auth-helpers": "^2.2.21",
-    "@lit-protocol/lit-node-client-nodejs": "^2.2.21",
+    "@lit-protocol/lit-node-client-nodejs": "^2.2.31",
     "ethers": "^5.7.2",
     "lit-siwe": "^1.1.8",
     "siwe": "^2.1.3",
